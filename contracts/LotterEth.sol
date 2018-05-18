@@ -17,7 +17,7 @@ contract LotterEth {
     event Purchase(address _buyer, uint _amount);
     
     function buyTickets(uint quantity) public payable {
-        if (msg.value != quantity*ticketPrice) {        //if caller sent wrong amount of ether, revert
+        if (msg.value != quantity * ticketPrice) {        //if caller sent wrong amount of ether, revert
             revert();
         }
         
