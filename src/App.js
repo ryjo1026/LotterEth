@@ -47,8 +47,8 @@ class App extends Component {
 
   render() {
     return (
-        <div className="web3">
-          BOI
+      <div className="web3">
+          <h1>BOI</h1>
       </div>);
   }
 }
