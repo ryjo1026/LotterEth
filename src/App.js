@@ -1,16 +1,44 @@
-import React, {Component} from 'react';
+import React from 'react';
 import Web3 from 'web3';
 import './App.css';
 
-class App extends Component {
+
+class AccountList extends React.Component {
+  constructor(props, context) {
+    super(props);
+    this.state = {
+          accounts: [],
+    };
+  }
+
+  updateCurrentAccount() {
+    this.props.web3.eth.getAccounts().then((newAccounts) => {
+      this.setState({
+        accounts: newAccounts,
+        });
+      });
+  }
+
+  render() {
+    // Continuously update account state
+    updateCurrentAccount();
+
+    const listAccounts = this.state.accounts.map((account) =>
+      <li key={account.toString()}>
+        {account}
+      </li>
+    );
+    return (<ul>{listAccounts}</ul>);
+  }
+}
+
+
+class App extends React.Component {
   constructor(props, context) {
     super(props);
 
     this.web3 = this.initWeb3();
-    this.contracts = [];
-    this.account = '0x0';
-
-    this.initContract();
+    this.contract = this.initContract();
   }
 
   initWeb3() {
@@ -33,10 +61,9 @@ class App extends Component {
     let LotterEth = contract(contractJson);
     LotterEth.setProvider(this.web3.currentProvider);
 
-    LotterEth.deployed().then(function(deployed) {
-      console.log('ayy');
-    });
+    return LotterEth;
   }
+
 
   // initContract() {
   //   $.getJSON("Lottery.json", function(lottery){
@@ -47,8 +74,8 @@ class App extends Component {
 
   render() {
     return (
-      <div className="web3">
-          <h1>BOI</h1>
+      <div className="app">
+          <AccountList web3={this.web3}/>
       </div>);
   }
 }
