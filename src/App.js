@@ -1,37 +1,7 @@
 import React from 'react';
 import Web3 from 'web3';
-import './App.css';
-
-
-class AccountList extends React.Component {
-  constructor(props, context) {
-    super(props);
-    this.state = {
-          accounts: [],
-    };
-  }
-
-  updateCurrentAccount() {
-    this.props.web3.eth.getAccounts().then((newAccounts) => {
-      this.setState({
-        accounts: newAccounts,
-        });
-      });
-  }
-
-  render() {
-    // Continuously update account state
-    updateCurrentAccount();
-
-    const listAccounts = this.state.accounts.map((account) =>
-      <li key={account.toString()}>
-        {account}
-      </li>
-    );
-    return (<ul>{listAccounts}</ul>);
-  }
-}
-
+import Account from './components/Account.js';
+import Lottery from './components/Lottery.js';
 
 class App extends React.Component {
   constructor(props, context) {
@@ -60,22 +30,15 @@ class App extends React.Component {
     let contract = require('truffle-contract');
     let LotterEth = contract(contractJson);
     LotterEth.setProvider(this.web3.currentProvider);
-
+    
     return LotterEth;
   }
-
-
-  // initContract() {
-  //   $.getJSON("Lottery.json", function(lottery){
-  //     App.contracts.Lottery = TruffleContract(lottery);
-  //     App.contracts.Lottery.setProvider(this.web3Provider)
-  //   })
-  // }
 
   render() {
     return (
       <div className="app">
-          <AccountList web3={this.web3}/>
+          <Account web3={this.web3}/>
+          <Lottery web3={this.web3} contract={this.contract}/>
       </div>);
   }
 }
