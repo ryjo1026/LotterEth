@@ -2,27 +2,32 @@ pragma solidity ^0.4.11;
 
 contract LotterEth {
 
-    mapping(uint => address) public players;
+    mapping(uint => address) players;
     address owner;
-    uint public ticketPrice = 1 ether;
-    uint public jackpotNeeded = 10;
+    address public previousWinner;
+    uint public ticketPrice = 0.01 ether;
+    uint public totalTickets = 100;
     uint public ticketsBought;
 
     constructor() public {
         owner = msg.sender;
+        previousWinner = 0x0;
         ticketsBought = 0;
     }
 
     // events
-    event Purchase(address _buyer, uint _amount);
-    event AnnounceWinner(address _winner);
+    // event Purchase(address _buyer, uint _amount);
+    // event AnnounceWinner(address _winner);
 
-    function buyTickets(uint quantity) public payable {
-        if (msg.value != quantity*ticketPrice) {        //if caller sent wrong amount of ether, revert
+    function () public payable {
+        uint quantity = msg.value / ticketPrice;
+        uint remainder = msg.value % ticketPrice;
+
+        if (remainder != 0) {
             revert();
         }
 
-        if (quantity > jackpotNeeded - ticketsBought) {     //if caller is trying to buy more tickets than are available, revert
+        if (quantity > (totalTickets - ticketsBought)) {
             revert();
         }
 
@@ -31,20 +36,20 @@ contract LotterEth {
             ++ticketsBought;
         }
 
-        emit Purchase(msg.sender, quantity);
+        // emit Purchase(msg.sender, quantity);
 
-        if (ticketsBought == jackpotNeeded) {     //if all tickets have been bought, choose a winner
+        if (ticketsBought == totalTickets) {     //if all tickets have been bought, choose a winner
             chooseWinner();
             resetLottery();
         }
-
     }
 
     function chooseWinner() private {
         uint rand = random();
         address winner = players[rand];
-        emit AnnounceWinner(winner);
-        winner.transfer(ticketPrice*jackpotNeeded);
+        previousWinner = winner;
+        // emit AnnounceWinner(winner);
+        winner.transfer(ticketPrice*totalTickets);
     }
 
     function resetLottery() private {
@@ -52,13 +57,10 @@ contract LotterEth {
     }
 
     function random() private view returns (uint) {
-        return uint(uint256(keccak256(block.timestamp, block.difficulty)) % jackpotNeeded);     // not the best prng - TODO: find a way to make a better one
+        return uint(uint256(keccak256(block.timestamp, block.difficulty)) % totalTickets);     // not the best prng - TODO: find a way to make a better one
     }
 
-    //event ViewJackpot (uint256 _jackpot);
-
-    //function currJackpot() public view returns (uint256) {
-        //emit ViewJackpot(address(this).balance);
-        //return address(this).balance;
-    //}
+    function ticketsLeft() public constant returns (uint) {
+        return totalTickets - ticketsBought;
+    }
 }
