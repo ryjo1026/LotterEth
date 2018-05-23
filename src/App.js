@@ -2,13 +2,13 @@ import React from 'react';
 import Web3 from 'web3';
 import Account from './components/Account.js';
 import Lottery from './components/Lottery.js';
+import Typography from '@material-ui/core/Typography';
 
 class App extends React.Component {
   constructor(props, context) {
     super(props);
 
     this.web3 = this.initWeb3();
-    this.contract = this.initContract();
   }
 
   initWeb3() {
@@ -23,22 +23,14 @@ class App extends React.Component {
     return web3;
   }
 
-  initContract() {
-    // Get pre-built JSON interface from truffle
-    let contractJson = require('./build/contracts/LotterEth.json');
-
-    let contract = require('truffle-contract');
-    let LotterEth = contract(contractJson);
-    LotterEth.setProvider(this.web3.currentProvider);
-    
-    return LotterEth;
-  }
-
   render() {
     return (
       <div className="app">
+          <Typography variant="display3" color="primary" align="center">
+            LotterEth
+          </Typography>
           <Account web3={this.web3}/>
-          <Lottery web3={this.web3} contract={this.contract}/>
+          <Lottery web3={this.web3}/>
       </div>);
   }
 }

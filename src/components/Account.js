@@ -34,9 +34,7 @@ class Account extends React.Component {
 
   updateCurrentAccount() {
     this.props.web3.eth.getAccounts().then((newAccount) => {
-      if (newAccount.toString() !== this.state.account) {
-        this.updateCurrentBalance(newAccount);
-      }
+      this.updateCurrentBalance(newAccount);
       this.setState({
         account: newAccount.toString(),
       });
@@ -57,22 +55,24 @@ class Account extends React.Component {
   render() {
     const {classes} = this.props;
     return (
-      <Card className={classes.card}>
-        <CardContent>
-          <Typography color="textSecondary">
-            Current Account:
-          </Typography>
-          <Typography component="p">
-            {this.state.account}
-          </Typography>
-          <Typography color="textSecondary">
-            Balance:
-          </Typography>
-          <Typography component="p">
-            {this.state.balance} ether
-          </Typography>
-        </CardContent>
-      </Card>
+      <div>
+        <Card className={classes.card}>
+          <CardContent>
+            <Typography color="textSecondary">
+              Current Account:
+            </Typography>
+            <Typography component="p">
+              {this.state.account}
+            </Typography>
+            <Typography color="textSecondary">
+              Balance:
+            </Typography>
+            <Typography component="p">
+              {this.state.balance} ether
+            </Typography>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 }
