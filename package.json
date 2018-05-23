@@ -4,15 +4,10 @@
   "private": true,
   "dependencies": {
     "@material-ui/core": "^1.0.0",
-    "drizzle": "^1.1.5",
-    "drizzle-react": "^1.1.1",
-    "eth-block-tracker-es5": "^2.3.2",
     "prop-types": "^15.6.1",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
     "react-scripts": "1.1.4",
-    "redux": "^4.0.0",
-    "redux-saga": "^0.16.0",
     "truffle-contract": "^3.0.5",
     "web3": "^1.0.0-beta.34"
   },

@@ -15,10 +15,6 @@ contract LotterEth {
         ticketsBought = 0;
     }
 
-    // events
-    // event Purchase(address _buyer, uint _amount);
-    // event AnnounceWinner(address _winner);
-
     function () public payable {
         uint quantity = msg.value / ticketPrice;
         uint remainder = msg.value % ticketPrice;
@@ -35,8 +31,6 @@ contract LotterEth {
             players[ticketsBought] = msg.sender;
             ++ticketsBought;
         }
-
-        // emit Purchase(msg.sender, quantity);
 
         if (ticketsBought == totalTickets) {     //if all tickets have been bought, choose a winner
             chooseWinner();
