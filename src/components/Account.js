@@ -5,7 +5,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 
-// TODO: Comments everywhere + wiki
+// Styles for Material-UI
 const styles = {
   card: {
     maxWidth: 500,
@@ -15,6 +15,7 @@ const styles = {
   },
 };
 
+// Current account info for MetaMask
 class Account extends React.Component {
   constructor(props, context) {
     super(props);
@@ -24,6 +25,7 @@ class Account extends React.Component {
     };
   }
 
+  // Updates current balance of account via Async web3 call
   updateCurrentBalance(account) {
     this.props.web3.eth.getBalance(account.toString()).then((newBalance) => {
       this.setState({
@@ -32,6 +34,7 @@ class Account extends React.Component {
     });
   }
 
+  // Updates current account via Async web3 call
   updateCurrentAccount() {
     this.props.web3.eth.getAccounts().then((newAccount) => {
       this.updateCurrentBalance(newAccount);
@@ -41,8 +44,10 @@ class Account extends React.Component {
     });
   }
 
+  // REACT EVENTS ----------
+
   componentDidMount() {
-    // Update account state every second
+    // Update account state every second in case changed in MetaMask
     this.interval = setInterval(() => {
       this.updateCurrentAccount();
     }, 1000);
@@ -77,7 +82,9 @@ class Account extends React.Component {
   }
 }
 Account.propTypes = {
+  // Necessary for Material-UI
   classes: PropTypes.object.isRequired,
 };
 
+// Export with Material-UI styles
 export default withStyles(styles)(Account);

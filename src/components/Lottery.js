@@ -10,6 +10,7 @@ import CardActions from '@material-ui/core/CardActions';
 import Typography from '@material-ui/core/Typography';
 import BigNumber from 'bignumber.js';
 
+// Styles for MetaMask
 const styles = {
   card: {
     maxWidth: 500,
@@ -24,25 +25,29 @@ const styles = {
   },
 };
 
+// Lottery contract info and interaction
 class Lottery extends React.Component {
   constructor(props, context) {
     super(props);
     this.state = {
         ticketAmount: 1,
         buttonText: 'Buy a Ticket for ether',
-        buttonEnabled: false,
+        buttonDisabled: false,
     };
 
+    // Create event listener for tickerAmount number form
     this.updateTicketAmount = this.updateTicketAmount.bind(this);
 
-    // Get pre-built JSON ABI TODO change to grabbing published from web
+    // Get pre-built JSON ABI locally TODO change to grabbing published from web
     let contractJson = require('../build/contracts/LotterEth.json');
     this.LotterEth = contract(contractJson);
     this.LotterEth.setProvider(this.props.web3.currentProvider);
 
+    // Hard-code Address of contract on Ropsten
     this.address = '0x1a0f0e2c3c1ad06c449b9f4f5448060a9ad48d16';
   }
 
+  // Get lotteryParticipants info from contract
   updateLotteryParticipants() {
     this.LotterEth.at(this.address).then((at) => {
       at.ticketsBought().then((newParticipants) => {
@@ -58,6 +63,7 @@ class Lottery extends React.Component {
     });
   }
 
+  // Get the current account used TODO will break here if not using MetaMask
   updateCurrentAccount() {
     this.props.web3.eth.getAccounts().then((newAccount) => {
       this.setState({
@@ -66,6 +72,8 @@ class Lottery extends React.Component {
     });
   }
 
+  // Buy ticket from contract, currently sends transsaction but could also
+  // convert to direct contract function call
   buyTicket() {
     let x = new BigNumber(this.state.ticketAmount);
     let price = this.state.ticketPriceRaw * x;
@@ -75,6 +83,49 @@ class Lottery extends React.Component {
       value: price});
     this.updateLotteryParticipants();
   }
+
+  // Determine how to update variables upon number field change
+  updateTicketAmount(e) {
+    if (e.target.value < 0) {
+      // No negatives
+      this.setState({
+        ticketAmount: 1,
+        buttonText: 'Buy a Ticket for '+this.state.ticketPrice+' ether',
+        buttonDisabled: false,
+      });
+    } else if (e.target.value === '' || Number(e.target.value) === 0) {
+      // Disable purchase for 0 or empty
+      this.setState({
+        ticketAmount: e.target.value,
+        buttonText: 'Buy '+ 0
+          +' Tickets for '
+          + 0
+          +' ether',
+        buttonDisabled: true,
+      });
+    } else if (e.target.value % 1 !== 0) {
+      // No decimals or fractions
+      this.setState({
+        ticketAmount: Math.floor(e.target.value),
+        buttonDisabled: false,
+      });
+    } else {
+      // Normal number handling
+      // TODO somehow creates floating point errors despite BigNumber
+      let x = new BigNumber(Number(e.target.value));
+      let y = new BigNumber(1000000000000000000);
+      this.setState({
+        ticketAmount: e.target.value,
+        buttonText: 'Buy '+ e.target.value
+          +' Tickets for '
+          + (x/y) * this.state.ticketPriceRaw
+          +' ether',
+        buttonDisabled: false,
+      });
+    }
+  }
+
+  // REACT EVENTS ----------
 
   componentWillMount() {
     this.LotterEth.at(this.address).then((at) => {
@@ -96,41 +147,6 @@ class Lottery extends React.Component {
       this.updateCurrentAccount();
       this.updateLotteryParticipants();
     }, 1000);
-  }
-
-  updateTicketAmount(e) {
-    if (e.target.value < 0) {
-      this.setState({
-        ticketAmount: 1,
-        buttonText: 'Buy a Ticket for '+this.state.ticketPrice+' ether',
-        buttonEnabled: false,
-      });
-    } else if (e.target.value === '' || Number(e.target.value) === 0) {
-      this.setState({
-        ticketAmount: e.target.value,
-        buttonText: 'Buy '+ 0
-          +' Tickets for '
-          + 0
-          +' ether',
-        buttonEnabled: true,
-      });
-    } else if (e.target.value % 1 !== 0) {
-      this.setState({
-        ticketAmount: Math.floor(e.target.value),
-        buttonEnabled: false,
-      });
-    } else {
-      let x = new BigNumber(Number(e.target.value));
-      let y = new BigNumber(1000000000000000000);
-      this.setState({
-        ticketAmount: e.target.value,
-        buttonText: 'Buy '+ e.target.value
-          +' Tickets for '
-          + (x/y) * this.state.ticketPriceRaw
-          +' ether',
-        buttonEnabled: false,
-      });
-    }
   }
 
   render() {
@@ -159,7 +175,7 @@ class Lottery extends React.Component {
         </CardContent>
         <CardActions>
           <Button variant="raised" color="primary" className={classes.button}
-            disabled={this.state.buttonEnabled}
+            disabled={this.state.buttonDisabled}
             onClick={ () => this.buyTicket()}>
             {this.state.buttonText}
           </Button>
